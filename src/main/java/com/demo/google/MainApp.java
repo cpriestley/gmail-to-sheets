@@ -9,8 +9,8 @@ import com.google.api.services.gmail.model.Message;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 public class MainApp {
@@ -24,7 +24,7 @@ public class MainApp {
 
         List<Message> messages = gmailService.getMessages();
 
-        Set<String> senders = gmailService.getSenders(messages);
+        List<Object> senders = new ArrayList<>(gmailService.getSenders(messages));
 
         Spreadsheet spreadsheet = sheetsService.createSpreadsheet("Gmail Unique Senders");
 

@@ -11,7 +11,6 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 public class SheetsService {
@@ -31,20 +30,11 @@ public class SheetsService {
         logger.log(java.util.logging.Level.INFO, String.format("Creating new spreadsheet: %s", title));
         Spreadsheet spreadsheet = new Spreadsheet().setProperties(new SpreadsheetProperties().setTitle(title));
         spreadsheet = service.spreadsheets().create(spreadsheet).setFields("spreadsheetId").execute();
-        logger.log(java.util.logging.Level.INFO, String.format("Returning spreadsheet: %s", title));
+        String spreadsheetId = spreadsheet.getSpreadsheetId();
+        logger.log(java.util.logging.Level.INFO, String.format("Returning spreadsheet: %s %s", title, spreadsheetId));
         return spreadsheet;
     }
 
-    /**
-     * Appends values to a spreadsheet.
-     *
-     * @param spreadsheetId    - Id of the spreadsheet.
-     * @param range            - Range of cells of the spreadsheet.
-     * @param valueInputOption - Determines how input data should be interpreted.
-     * @param values           - list of rows of values to input.
-     * @return spreadsheet with appended values
-     * @throws IOException - if credentials file not found.
-     */
     private AppendValuesResponse appendValues(String spreadsheetId,
                                                     String range,
                                                     String valueInputOption,
@@ -74,8 +64,8 @@ public class SheetsService {
         return result;
     }
 
-    public AppendValuesResponse writeSendersToSheet(Spreadsheet spreadsheet, Set<String> senders) throws IOException {
-        return appendValues(spreadsheet.getSpreadsheetId(), "A1", "USER_ENTERED", List.of(List.of(senders)));
+    public AppendValuesResponse writeSendersToSheet(Spreadsheet spreadsheet, List<Object> senders) throws IOException {
+        return appendValues(spreadsheet.getSpreadsheetId(), "A1", "USER_ENTERED", List.of(senders));
     }
 
 

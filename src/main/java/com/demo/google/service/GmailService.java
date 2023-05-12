@@ -58,7 +58,7 @@ public class GmailService {
                     .map(MessagePartHeader::getValue)
                     .orElse("Unknown Sender");
             senders.add(sender);
-            if ((counter % 100) == 0) {
+            if ((counter % 50) == 0) {
                 logger.log(java .util.logging.Level.INFO, String.format("Processed %d emails of %d", counter, total));
             }
         }
