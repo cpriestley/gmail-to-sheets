@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.google.api.services.gmail.GmailScopes.GMAIL_READONLY;
@@ -28,12 +29,12 @@ public class CredentialsService {
 
     public CredentialsService() {
         this.logger = Logger.getLogger(CredentialsService.class.getName());
-        logger.log(java.util.logging.Level.INFO, "CredentialsService instantiated");
+        logger.log(Level.INFO, "CredentialsService instantiated");
     }
 
     public Credential getCredentials()
             throws IOException, GeneralSecurityException {
-        logger.log(java.util.logging.Level.INFO, "Getting credentials");
+        logger.log(Level.INFO, "Getting credentials");
         HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         GsonFactory jsonFactory = GsonFactory.getDefaultInstance();
         InputStream in = GmailService.class.getResourceAsStream("/credentials.json");
@@ -41,13 +42,13 @@ public class CredentialsService {
             throw new FileNotFoundException("Resource not found: " + "/credentials.json");
         }
 
-        logger.log(java.util.logging.Level.INFO, "Getting client secrets");
+        logger.log(Level.INFO, "Getting client secrets");
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(jsonFactory, new InputStreamReader(in));
 
         //Create request initializer to increase the timeout
         HttpRequestInitializer requestInitializer = (httpRequest) -> httpRequest.setReadTimeout(30000);
 
-        logger.log(java.util.logging.Level.INFO, "Building flow and triggering user authorization request");
+        logger.log(Level.INFO, "Building flow and triggering user authorization request");
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 httpTransport, jsonFactory, clientSecrets, Set.of(GMAIL_READONLY, GMAIL_SEND, SPREADSHEETS))
                 .setDataStoreFactory(new FileDataStoreFactory(new java.io.File("tokens")))
@@ -55,7 +56,7 @@ public class CredentialsService {
                 .setRequestInitializer(requestInitializer)
                 .build();
 
-        logger.log(java.util.logging.Level.INFO, "Getting local server receiver.");
+        logger.log(Level.INFO, "Getting local server receiver.");
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }

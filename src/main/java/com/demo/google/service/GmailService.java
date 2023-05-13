@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GmailService {
@@ -23,7 +24,7 @@ public class GmailService {
         service = new Gmail.Builder(credential.getTransport(), credential.getJsonFactory(), credential)
                 .setApplicationName("Test Scraper")
                 .build();
-        logger.log(java.util.logging.Level.INFO, "GmailService instantiated");
+        logger.log(Level.INFO, "GmailService instantiated");
     }
 
     public List<Message> getMessages() throws IOException {
@@ -31,7 +32,7 @@ public class GmailService {
         String user = "me";
         String pageToken = null;
 
-        logger.log(java.util.logging.Level.INFO, "Getting emails from gmail");
+        logger.log(Level.INFO, "Getting emails from gmail");
         List<Message> messages = new ArrayList<>();
         do {
             logger.log(java.util.logging.Level.INFO, String.format("Getting emails from pageToken: %s", pageToken));
@@ -40,7 +41,7 @@ public class GmailService {
             pageToken = response.getNextPageToken();
         } while (pageToken != null);
 
-        logger.log(java.util.logging.Level.INFO, "Returning emails");
+        logger.log(Level.INFO, "Returning emails");
         return messages;
     }
 
@@ -48,7 +49,7 @@ public class GmailService {
         Set<String> senders = new HashSet<>();
         long counter = 0;
         final int total = messages.size();
-        logger.log(java.util.logging.Level.INFO, "Begin getting senders from emails");
+        logger.log(Level.INFO, "Begin getting senders from emails");
         for (Message message : messages) {
             counter++;
             Message fullMessage = service.users().messages().get("me", message.getId()).execute();

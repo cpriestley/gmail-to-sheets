@@ -11,6 +11,7 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SheetsService {
@@ -23,15 +24,15 @@ public class SheetsService {
         service = new Sheets.Builder(credential.getTransport(), credential.getJsonFactory(), credential)
                 .setApplicationName("Test Scraper")
                 .build();
-        logger.log(java.util.logging.Level.INFO, "SheetsService instantiated");
+        logger.log(Level.INFO, "SheetsService instantiated");
     }
 
     public Spreadsheet createSpreadsheet(String title) throws IOException {
-        logger.log(java.util.logging.Level.INFO, String.format("Creating new spreadsheet: %s", title));
+        logger.log(Level.INFO, String.format("Creating new spreadsheet: %s", title));
         Spreadsheet spreadsheet = new Spreadsheet().setProperties(new SpreadsheetProperties().setTitle(title));
         spreadsheet = service.spreadsheets().create(spreadsheet).setFields("spreadsheetId").execute();
         String spreadsheetId = spreadsheet.getSpreadsheetId();
-        logger.log(java.util.logging.Level.INFO, String.format("Returning spreadsheet: %s %s", title, spreadsheetId));
+        logger.log(Level.INFO, String.format("Returning spreadsheet: %s %s", title, spreadsheetId));
         return spreadsheet;
     }
 
@@ -44,9 +45,8 @@ public class SheetsService {
         AppendValuesResponse result = null;
         try {
             // Append values to the specified range.
-            ValueRange body = new ValueRange()
-                    .setValues(values);
-            logger.log(java.util.logging.Level.INFO, "Writing values to spreadsheet");
+            ValueRange body = new ValueRange().setMajorDimension("COLUMNS").setValues(values);
+            logger.log(Level.INFO, "Writing values to spreadsheet");
             result = service.spreadsheets().values().append(spreadsheetId, range, body)
                     .setValueInputOption(valueInputOption)
                     .execute();
@@ -55,12 +55,12 @@ public class SheetsService {
         } catch (GoogleJsonResponseException e) {
             GoogleJsonError error = e.getDetails();
             if (error.getCode() == 404) {
-                System.out.printf("Spreadsheet not found with id '%s'.\n", spreadsheetId);
+                logger.log(Level.WARNING, String.format("Spreadsheet not found with id '%s'.\n", spreadsheetId));
             } else {
                 throw e;
             }
         }
-        logger.log(java.util.logging.Level.INFO, "Returning append values response");
+        logger.log(Level.INFO, "Returning append values response");
         return result;
     }
 
