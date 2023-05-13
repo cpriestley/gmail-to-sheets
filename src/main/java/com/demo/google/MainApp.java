@@ -5,8 +5,6 @@ import com.demo.google.service.CredentialsService;
 import com.demo.google.service.GmailService;
 import com.demo.google.service.SheetsService;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.services.gmail.model.Message;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 
 import java.util.ArrayList;
