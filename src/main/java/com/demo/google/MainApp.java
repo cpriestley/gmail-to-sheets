@@ -20,13 +20,11 @@ public class MainApp {
         Logger logger = Logger.getLogger(MainApp.class.getName());
         logger.log(Level.INFO, "Starting application");
         Credential credential = (new CredentialsService()).getCredentials();
+
         GmailService gmailService = new GmailService(credential);
+        List<Object> senders = new ArrayList<>(gmailService.getAllSenders());
+
         SheetsService sheetsService = new SheetsService(credential);
-
-        List<Message> messages = gmailService.getMessages();
-
-        List<Object> senders = new ArrayList<>(gmailService.getSenders(messages));
-
         Spreadsheet spreadsheet = sheetsService.createSpreadsheet("Gmail Unique Senders");
         sheetsService.writeSendersToSheet(spreadsheet, senders);
         logger.log(Level.INFO, "Application finished");
