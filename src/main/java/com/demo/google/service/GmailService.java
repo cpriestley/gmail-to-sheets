@@ -27,16 +27,25 @@ public class GmailService {
         logger.log(Level.INFO, "GmailService instantiated");
     }
 
-    public List<Message> getMessages() throws IOException {
-        // Get the messages from the user's mailbox
+    private ListMessagesResponse getListMessagesResponse(String pageToken) throws IOException {
         String user = "me";
+        logger.log(Level.INFO, String.format("Getting emails from %s", pageToken == null ? "first page" : "pageToken: " + pageToken));
+        return service.users().messages().list(user).setPageToken(pageToken).execute();
+    }
+
+    public ListMessagesResponse getMessagesFromPageToken(String pageToken) throws IOException {
+        return getListMessagesResponse(pageToken);
+    }
+
+    public List<Message> getAllMessages() throws IOException {
+        // Get the messages from the user's mailbox
         String pageToken = null;
 
         logger.log(Level.INFO, "Getting emails from gmail");
         List<Message> messages = new ArrayList<>();
         do {
-            logger.log(java.util.logging.Level.INFO, String.format("Getting emails from pageToken: %s", pageToken));
-            ListMessagesResponse response = service.users().messages().list(user).setPageToken(pageToken).execute();
+            logger.log(Level.INFO, String.format("Getting emails from pageToken: %s", pageToken));
+            ListMessagesResponse response = getMessagesFromPageToken(pageToken);
             messages.addAll(response.getMessages());
             pageToken = response.getNextPageToken();
         } while (pageToken != null);
@@ -66,4 +75,13 @@ public class GmailService {
         return senders;
     }
 
+    public Set<String> getAllSenders() {
+
+        try {
+            return new HashSet<>(getSenders(getAllMessages()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
