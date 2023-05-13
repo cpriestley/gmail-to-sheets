@@ -50,8 +50,6 @@ public class SheetsService {
             result = service.spreadsheets().values().append(spreadsheetId, range, body)
                     .setValueInputOption(valueInputOption)
                     .execute();
-            // Prints the spreadsheet with appended values.
-            System.out.printf("%d cells appended.", result.getUpdates().getUpdatedCells());
         } catch (GoogleJsonResponseException e) {
             GoogleJsonError error = e.getDetails();
             if (error.getCode() == 404) {
