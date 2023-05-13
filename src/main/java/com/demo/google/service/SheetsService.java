@@ -63,8 +63,11 @@ public class SheetsService {
     }
 
     public AppendValuesResponse writeSendersToSheet(Spreadsheet spreadsheet, List<Object> senders) throws IOException {
-        return appendValues(spreadsheet.getSpreadsheetId(), "A1", "USER_ENTERED", List.of(senders));
+        AppendValuesResponse appendValuesResponse = appendValues(
+                spreadsheet.getSpreadsheetId(), "A1", "USER_ENTERED", List.of(senders)
+        );
+        logger.log(Level.INFO, String.format("Wrote %s cells to sheet.%n", appendValuesResponse.getUpdates().getUpdatedCells()));
+        return appendValuesResponse;
     }
-
 
 }
