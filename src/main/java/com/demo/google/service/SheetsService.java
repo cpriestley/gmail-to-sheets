@@ -77,7 +77,7 @@ public class SheetsService {
     }
 
     private List<List<Object>> cleanValues(List<List<Object>> values) {
-        logger.log(Level.INFO, "Clean 'From' values to extract only the email addresses.");
+        logger.log(Level.INFO, "Cleaning 'From' values to extract only the email addresses.");
         List<Object> senders = new ArrayList<>(values.get(0));
         Object[] newList = senders.stream().map(sender -> {
             Pattern pattern = Pattern.compile("<(.*?)>");
@@ -87,6 +87,7 @@ public class SheetsService {
             }
             return sender;
         }).toArray();
+        logger.log(Level.INFO, "Return cleaned values.");
         return List.of(new ArrayList<>(Arrays.asList(newList)));
     }
 
