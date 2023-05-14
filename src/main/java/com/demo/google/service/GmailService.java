@@ -41,7 +41,7 @@ public class GmailService {
     public List<Message> getMessagesFromPageToken(String token) throws IOException {
         ListMessagesResponse response = getListMessagesResponse(token);
         pageToken = response.getNextPageToken();
-        logger.log(Level.INFO, String.format("Returning emails from %s", pageToken == null ? "first page" : "pageToken: " + pageToken));
+        logger.log(Level.INFO, String.format("Returning emails from %s", token == null ? "first page" : "pageToken: " + pageToken));
         return response.getMessages();
     }
 
