@@ -10,9 +10,13 @@ import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SheetsService {
 
@@ -44,7 +48,9 @@ public class SheetsService {
 
         AppendValuesResponse result = null;
         try {
-            // Append values to the specified range.
+            values = cleanValues(values);
+            values.get(0).add(0, "Sender");
+            // Append values to the specified range, starting at row 1.
             ValueRange body = new ValueRange().setMajorDimension("COLUMNS").setValues(values);
             logger.log(Level.INFO, "Writing values to spreadsheet");
             result = service.spreadsheets().values().append(spreadsheetId, range, body)
@@ -66,8 +72,22 @@ public class SheetsService {
         AppendValuesResponse appendValuesResponse = appendValues(
                 spreadsheet.getSpreadsheetId(), "A1", "USER_ENTERED", List.of(senders)
         );
-        logger.log(Level.INFO, String.format("Wrote %s cells to sheet.%n", appendValuesResponse.getUpdates().getUpdatedCells()));
+        logger.log(Level.INFO, String.format("Wrote %s cells to sheet.", appendValuesResponse.getUpdates().getUpdatedCells()));
         return appendValuesResponse;
+    }
+
+    private List<List<Object>> cleanValues(List<List<Object>> values) {
+        List<Object> senders = new ArrayList<>(values.get(0));
+        Object[] newList = senders.stream().map(sender -> {
+            Pattern pattern = Pattern.compile("<(.*?)>");
+            Matcher matcher = pattern.matcher((String) sender);
+            if (matcher.find()) {
+                return matcher.group(1);
+            } else {
+                return sender;
+            }
+        }).toArray();
+        return List.of(new ArrayList<>(Arrays.asList(newList)));
     }
 
 }
