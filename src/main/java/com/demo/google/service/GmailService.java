@@ -18,6 +18,7 @@ public class GmailService {
 
     Logger logger;
     private final Gmail service;
+    private String pageToken = null;
 
     public GmailService(Credential credential) {
         this.logger = Logger.getLogger(GmailService.class.getName());
@@ -33,24 +34,25 @@ public class GmailService {
         return service.users().messages().list(user).setPageToken(pageToken).execute();
     }
 
-    public ListMessagesResponse getMessagesFromPageToken(String pageToken) throws IOException {
-        return getListMessagesResponse(pageToken);
+    public List<Message> getMessagesFromFirstPage() throws IOException {
+        return getMessagesFromPageToken(null);
+    }
+
+    public List<Message> getMessagesFromPageToken(String token) throws IOException {
+        ListMessagesResponse response = getListMessagesResponse(token);
+        pageToken = response.getNextPageToken();
+        logger.log(Level.INFO, String.format("Returning emails from %s", pageToken == null ? "first page" : "pageToken: " + pageToken));
+        return response.getMessages();
     }
 
     public List<Message> getAllMessages() throws IOException {
-        // Get the messages from the user's mailbox
-        String pageToken = null;
-
-        logger.log(Level.INFO, "Getting emails from gmail");
+        pageToken = null;
         List<Message> messages = new ArrayList<>();
         do {
-            logger.log(Level.INFO, String.format("Getting emails from pageToken: %s", pageToken));
-            ListMessagesResponse response = getMessagesFromPageToken(pageToken);
-            messages.addAll(response.getMessages());
-            pageToken = response.getNextPageToken();
+            messages.addAll(getMessagesFromPageToken(pageToken));
         } while (pageToken != null);
 
-        logger.log(Level.INFO, "Returning emails");
+        logger.log(Level.INFO, "Returning all emails");
         return messages;
     }
 
